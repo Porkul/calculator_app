@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:math_expressions/math_expressions.dart';
 
 void main() {
   runApp(Calculator());
@@ -26,6 +29,13 @@ class SimpleCalculator extends StatefulWidget {
 }
 
 class _SimpleCalculatorState extends State<SimpleCalculator> {
+  String equation = "0";
+  String result = "0";
+  String expression = "";
+  double equationFontSize = 38.0;
+  double resultFontSize = 48.0;
+  Color cyanSecond = const Color.fromARGB(255, 18, 150, 168);
+
   Widget buildButton(
       String buttonText, double buttonHeight, Color buttonColor) {
     return Container(
@@ -37,7 +47,7 @@ class _SimpleCalculatorState extends State<SimpleCalculator> {
             textStyle: const TextStyle(fontSize: 20),
             side: const BorderSide(
                 color: Colors.white, width: 1, style: BorderStyle.solid)),
-        onPressed: null,
+        onPressed: () => buttonPressed(buttonText),
         child: Text(
           buttonText,
           style: const TextStyle(
@@ -47,14 +57,60 @@ class _SimpleCalculatorState extends State<SimpleCalculator> {
     );
   }
 
+  buttonPressed(String buttonText) {
+    setState(() {
+      if (buttonText == "C") {
+        equation = "0";
+        result = "0";
+        equationFontSize = 38.0;
+        resultFontSize = 48.0;
+      } else if (buttonText == "⌫") {
+        equationFontSize = 48.0;
+        resultFontSize = 38.0;
+        equation = equation.substring(0, equation.length - 1);
+        if (equation == "") {
+          equation = "0";
+        }
+      } else if (buttonText == "ANS") {
+        if (equation.endsWith('+') ||
+            equation.endsWith('-') ||
+            equation.endsWith('*') ||
+            equation.endsWith('/')) {
+          equation += result;
+        } else {
+          equation = result;
+        }
+      } else if (buttonText == "=") {
+        equationFontSize = 38.0;
+        resultFontSize = 48.0;
+
+        expression = equation;
+        expression = expression.replaceAll('×', '*');
+        expression = expression.replaceAll('÷', '/');
+
+        try {
+          Parser p = Parser();
+          Expression exp = p.parse(expression);
+
+          ContextModel cm = ContextModel();
+          result = '${exp.evaluate(EvaluationType.REAL, cm)}';
+        } catch (e) {
+          result = "Error";
+        }
+      } else {
+        equationFontSize = 48.0;
+        resultFontSize = 38.0;
+        if (equation == "0") {
+          equation = buttonText;
+        } else {
+          equation = equation + buttonText;
+        }
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    String equation = "5";
-    String result = "10";
-    double equationFontSize = 38.0;
-    double resultFontSize = 48.0;
-    Color cyanSecond = const Color.fromARGB(255, 18, 150, 168);
-
     return Scaffold(
       appBar: AppBar(title: const Text('Simple Calculator')),
       body: Column(
@@ -108,7 +164,7 @@ class _SimpleCalculatorState extends State<SimpleCalculator> {
                     TableRow(children: [
                       buildButton(".", 1, Colors.blueGrey),
                       buildButton("0", 1, Colors.blueGrey),
-                      buildButton("00", 1, Colors.blueGrey),
+                      buildButton("ANS", 1, Colors.blueGrey),
                     ]),
                   ],
                 ),
