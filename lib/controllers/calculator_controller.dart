@@ -1,6 +1,9 @@
 import 'package:math_expressions/math_expressions.dart';
-import '/models/calculator_model.dart';
+
 import '/constants/calculator_buttons.dart';
+import '/models/calculation_model.dart';
+import '/models/calculator_model.dart';
+import 'persistence/sql_persistence.dart';
 
 class CalculatorController {
   final CalculatorModel model;
@@ -26,17 +29,23 @@ class CalculatorController {
     }
   }
 
+  Future<List<Calculation>> get getAllCalculations {
+    return SqlPersistence.instance.getAllCalculations();
+  }
+
+  Future<void> get clearHistory {
+    return SqlPersistence.instance.clearHistory();
+  }
+
   void clear() {
     model.equation = "0";
     model.result = "0";
   }
 
   void backspace() {
-    if (model.equation.length > 1) {
-      model.equation = model.equation.substring(0, model.equation.length - 1);
-    } else {
-      model.equation = "0";
-    }
+    model.equation = (model.equation.length > 1)
+        ? model.equation.substring(0, model.equation.length - 1)
+        : "0";
   }
 
   void appendAnswer() {
@@ -50,16 +59,29 @@ class CalculatorController {
     }
   }
 
-  void evaluate() {
+  void evaluate() async {
     String expression = model.equation;
     expression = expression.replaceAll('×', '*');
     expression = expression.replaceAll('÷', '/');
+
+    if (!RegExp(r'[-+*/]').hasMatch(expression)) {
+      return;
+    }
+
     try {
       Parser p = Parser();
       Expression exp = p.parse(expression);
       ContextModel cm = ContextModel();
       model.result = '${exp.evaluate(EvaluationType.REAL, cm)}';
       model.equation = model.result;
+
+      Calculation calculation = Calculation(
+        expression: expression,
+        result: double.parse(model.result),
+        date: DateTime.now(),
+      );
+
+      await SqlPersistence.instance.createCalculation(calculation);
     } catch (e) {
       model.result = "Error";
     }

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+
+import '/constants/colors.dart' as colors;
 import '/controllers/calculator_controller.dart';
 import '/models/calculator_model.dart';
-import '/constants/colors.dart' as colors;
 
 class CalculatorScreen extends StatefulWidget {
   const CalculatorScreen({Key? key}) : super(key: key);
@@ -11,36 +12,12 @@ class CalculatorScreen extends StatefulWidget {
 }
 
 class _CalculatorScreenState extends State<CalculatorScreen> {
-  final CalculatorController _controller =
-      CalculatorController(CalculatorModel());
-
   static const double equationFontSize = 38.0;
+
   static const double resultFontSize = 48.0;
   static const Color cyanSecond = colors.cyanSecond;
-
-  Widget _buildButton(
-      String buttonText, double buttonHeight, Color buttonColor) {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.1 * buttonHeight,
-      color: buttonColor,
-      child: TextButton(
-        style: TextButton.styleFrom(
-            padding: const EdgeInsets.all(16.0),
-            textStyle: const TextStyle(fontSize: 20),
-            side: const BorderSide(
-                color: Colors.white, width: 1, style: BorderStyle.solid)),
-        onPressed: () {
-          _controller.buttonPressed(buttonText);
-          setState(() {});
-        },
-        child: Text(
-          buttonText,
-          style: const TextStyle(
-              fontSize: 30, fontWeight: FontWeight.normal, color: Colors.white),
-        ),
-      ),
-    );
-  }
+  final CalculatorController _controller =
+      CalculatorController(CalculatorModel());
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +29,12 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
             icon: const Icon(Icons.calculate, size: equationFontSize),
             onPressed: () {
               Navigator.pushNamed(context, '/converter-screen');
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.list, size: equationFontSize),
+            onPressed: () {
+              Navigator.pushNamed(context, '/history-screen');
             },
           ),
         ],
@@ -134,6 +117,30 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildButton(
+      String buttonText, double buttonHeight, Color buttonColor) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.1 * buttonHeight,
+      color: buttonColor,
+      child: TextButton(
+        style: TextButton.styleFrom(
+            padding: const EdgeInsets.all(16.0),
+            textStyle: const TextStyle(fontSize: 20),
+            side: const BorderSide(
+                color: Colors.white, width: 1, style: BorderStyle.solid)),
+        onPressed: () {
+          _controller.buttonPressed(buttonText);
+          setState(() {});
+        },
+        child: Text(
+          buttonText,
+          style: const TextStyle(
+              fontSize: 30, fontWeight: FontWeight.normal, color: Colors.white),
+        ),
       ),
     );
   }
