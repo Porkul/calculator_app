@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '/controllers/calculator_controller.dart';
 import '/models/calculator_model.dart';
+import '/constants/colors.dart' as colors;
 
 class CalculatorScreen extends StatefulWidget {
   const CalculatorScreen({Key? key}) : super(key: key);
@@ -15,7 +16,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
 
   static const double equationFontSize = 38.0;
   static const double resultFontSize = 48.0;
-  static const Color cyanSecond = Color.fromARGB(255, 18, 150, 168);
+  static const Color cyanSecond = colors.cyanSecond;
 
   Widget _buildButton(
       String buttonText, double buttonHeight, Color buttonColor) {
@@ -44,7 +45,17 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Calculator')),
+      appBar: AppBar(
+        title: const Text('Calculator'),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.calculate, size: equationFontSize),
+            onPressed: () {
+              Navigator.pushNamed(context, '/converter-screen');
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: <Widget>[
           Container(
