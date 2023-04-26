@@ -5,8 +5,10 @@ import 'models/calculator_model.dart';
 import 'screens/calculator_screen.dart';
 import 'screens/converter_screen.dart';
 import 'screens/history_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
   runApp(MyApp());
 }
 

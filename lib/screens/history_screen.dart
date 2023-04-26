@@ -23,7 +23,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Future<void> _loadCalculations() async {
-    _futureCalculations = widget.controller.getAllCalculations;
+    _futureCalculations =
+        widget.controller.getAllCalculations as Future<List<Calculation>>;
   }
 
   @override
@@ -41,6 +42,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           );
         } else {
           final List<Calculation> calculations = snapshot.data!;
+
           return Scaffold(
             appBar: AppBar(
               title: const Text('History'),

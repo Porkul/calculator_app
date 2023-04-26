@@ -3,10 +3,14 @@ import 'package:math_expressions/math_expressions.dart';
 import '/constants/calculator_buttons.dart';
 import '/models/calculation_model.dart';
 import '/models/calculator_model.dart';
-import 'persistence/sql_persistence.dart';
+import 'persistence/firebase_persistance.dart';
+import 'persistence/persistence.dart';
+// import 'persistence/sql_persistence.dart';
 
 class CalculatorController {
   final CalculatorModel model;
+
+  Persistence persistence = FirebasePersistence();
 
   CalculatorController(this.model);
 
@@ -30,11 +34,11 @@ class CalculatorController {
   }
 
   Future<List<Calculation>> get getAllCalculations {
-    return SqlPersistence.instance.getAllCalculations();
+    return persistence.getAllCalculations();
   }
 
   Future<void> get clearHistory {
-    return SqlPersistence.instance.clearHistory();
+    return persistence.clearHistory();
   }
 
   void clear() {
@@ -81,8 +85,11 @@ class CalculatorController {
         date: DateTime.now(),
       );
 
-      await SqlPersistence.instance.createCalculation(calculation);
+      // await SqlPersistence.instance.createCalculation(calculation);
+      await persistence.createCalculation(calculation);
     } catch (e) {
+      print("error message");
+      print(e);
       model.result = "Error";
     }
   }

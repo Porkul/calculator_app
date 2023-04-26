@@ -11,6 +11,14 @@ class Calculation {
     required this.date,
   });
 
+  // Map<String, dynamic> toMap() {
+  //   Map<String, dynamic> map = {};
+  //   map["expression"] = expression;
+  //   map["result"] = result;
+  //   map["date"] = date;
+  //   return map;
+  // }
+
   String formatEquation() {
     final RegExp regExp = RegExp(r'([-+*/=])(\d|\.)');
 
@@ -24,8 +32,8 @@ class Calculation {
   }
 
   Map<String, Object?> toJson() => {
-        'expression': expression,
-        'result': result,
+        'expression': "$expression",
+        'result': "$result",
         'date': date.toIso8601String(),
       };
 
