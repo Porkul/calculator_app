@@ -1,6 +1,9 @@
+import 'package:uuid/uuid.dart';
+
 const String calculationTable = "calculations";
 
 class Calculation {
+  late String id;
   final String expression;
   final double result;
   final DateTime date;
@@ -9,15 +12,9 @@ class Calculation {
     required this.expression,
     required this.result,
     required this.date,
-  });
-
-  // Map<String, dynamic> toMap() {
-  //   Map<String, dynamic> map = {};
-  //   map["expression"] = expression;
-  //   map["result"] = result;
-  //   map["date"] = date;
-  //   return map;
-  // }
+  }) {
+    id = Uuid().v4();
+  }
 
   String formatEquation() {
     final RegExp regExp = RegExp(r'([-+*/=])(\d|\.)');
@@ -31,17 +28,14 @@ class Calculation {
     return '$formattedExpression = $formattedResult';
   }
 
-  Map<String, Object?> toJson() => {
-        'expression': "$expression",
-        'result': "$result",
-        'date': date.toIso8601String(),
-      };
-
-  static Calculation fromJson(Map<String, Object?> json) => Calculation(
-        expression: json['expression'] as String,
-        result: double.parse(json['result'] as String),
-        date: DateTime.parse(json['date'] as String),
-      );
+  Map<String, dynamic> toMap() {
+    Map<String, dynamic> map = {};
+    map["id"] = id;
+    map["expression"] = expression;
+    map["result"] = result;
+    map["date"] = date.toString();
+    return map;
+  }
 }
 
 class CalculationFields {

@@ -7,9 +7,11 @@ import '/models/calculation_model.dart';
 class SqlPersistence extends Persistence {
   static final SqlPersistence _instance = SqlPersistence.internal();
 
-  static SqlPersistence get instance => _instance;
-
   static Database? _db;
+
+  static SqlPersistence get instance => _instance;
+  SqlPersistence.internal();
+
   Future<Database> get db async {
     if (_db != null) {
       return _db!;
@@ -18,13 +20,37 @@ class SqlPersistence extends Persistence {
     return _db!;
   }
 
-  SqlPersistence.internal();
+  @override
+  Future<int> clearHistory() async {
+    final db = await _instance.db;
+    int result = await db.rawDelete('DELETE FROM $calculationTable');
+    return result;
+  }
 
-  Future<Database> _initDB(String filename) async {
-    final databasePath = await getDatabasesPath();
-    final path = join(databasePath, filename);
+  Future close() async {
+    final db = await _instance.db;
+    db!.close();
+  }
 
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+  @override
+  Future<Calculation> createCalculation(Calculation calculation) async {
+    final db = await _instance.db;
+    await db!.insert(calculationTable, calculation.toMap());
+    return calculation;
+  }
+
+  @override
+  Future<List<Calculation>> getAllCalculations() async {
+    final db = await _instance.db;
+    final result = await db!
+        .query(calculationTable, orderBy: '${CalculationFields.date} DESC');
+    return result.map((e) {
+      return Calculation(
+        date: DateTime.parse(e['date'] as String),
+        expression: e['expression'] as String,
+        result: double.parse(e['result'] as String),
+      );
+    }).toList();
   }
 
   Future _createDB(Database db, int version) async {
@@ -36,30 +62,10 @@ class SqlPersistence extends Persistence {
     )''');
   }
 
-  Future close() async {
-    final db = await _instance.db;
-    db!.close();
-  }
+  Future<Database> _initDB(String filename) async {
+    final databasePath = await getDatabasesPath();
+    final path = join(databasePath, filename);
 
-  @override
-  Future<Calculation> createCalculation(Calculation calculation) async {
-    final db = await _instance.db;
-    await db!.insert(calculationTable, calculation.toJson());
-    return calculation;
-  }
-
-  @override
-  Future<List<Calculation>> getAllCalculations() async {
-    final db = await _instance.db;
-    final result = await db!
-        .query(calculationTable, orderBy: '${CalculationFields.date} DESC');
-    return result.map((e) => Calculation.fromJson(e)).toList();
-  }
-
-  @override
-  Future<int> clearHistory() async {
-    final db = await _instance.db;
-    int result = await db.rawDelete('DELETE FROM $calculationTable');
-    return result;
+    return await openDatabase(path, version: 1, onCreate: _createDB);
   }
 }
